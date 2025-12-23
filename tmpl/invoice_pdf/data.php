@@ -29,7 +29,7 @@ return [
         'company_email' => 'trevor@example.com',
     ],
 
-    'invoice' => (object) [
+    'invoice' => [
         'number' => '0001',
         'client_name' => 'Process Therapy Institute',
         'title' => 'Website Maintenance',
