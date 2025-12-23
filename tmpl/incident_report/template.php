@@ -6,8 +6,8 @@ $displayData ??= [];
 $task = $displayData['task'] ?? 'previewPdf';
 
 $incident  = ($displayData['incident'] ?? null);
-$account  = (object) ($displayData['account'] ?? null);
-$client   = (object) ($displayData['client'] ?? null);
+$account  = ($displayData['account'] ?? null);
+$client   =  ($displayData['client'] ?? null);
 $business =  ($displayData['business'] ?? null);
 $items    = $incident->items ?? [];
 
@@ -27,7 +27,7 @@ function e($s): string {
 
 <head>
     <meta charset="utf-8">
-    <title>incident <?= e($incident->number ?? ''); ?></title>
+    <title>Incident <?= e($incident['number'] ?? ''); ?></title>
 
     <style>
         body {
@@ -121,7 +121,11 @@ function e($s): string {
         }
 
         .timeline-section table thead tr th {
-            border-bottom: 1px solid #CCC;
+            border: 1px solid #CCC;
+        }
+        .timeline-section table tbody tr th:nth-child(2) {
+    
+            border-right: 0px !important;
         }
 
         .timeline-section tr td {
@@ -193,18 +197,18 @@ function e($s): string {
             <br/><br/><br/>
 
             <div class="client-info" style="margin-top: 0;line-height:1.2em;font-size:12pt;font-weight:300;">
-                <p style="margin:0px;"><?php echo htmlspecialchars($client->name ?? $incident->client_name ?? ''); ?></p>
-                <?php if (!empty($client->address_1)): ?>
-                    <p style="margin:0px;"><?php echo htmlspecialchars($client->address_1); ?></p>
+                <p style="margin:0px;"><?php echo htmlspecialchars($client['name'] ?? $incident->client_name ?? ''); ?></p>
+                <?php if (!empty($client['address_1'])): ?>
+                    <p style="margin:0px;"><?php echo htmlspecialchars($client['address_1']); ?></p>
                 <?php endif; ?>
-                <?php if (!empty($client->address_2)): ?>
-                    <p style="margin:0px;"><?php echo htmlspecialchars($client->address_2); ?></p>
+                <?php if (!empty($client['address_2'])): ?>
+                    <p style="margin:0px;"><?php echo htmlspecialchars($client['address_2']); ?></p>
                 <?php endif; ?>
-                <?php if (!empty($client->city) || !empty($client->state) || !empty($client->zip)): ?>
+                <?php if (!empty($client['city']) || !empty($client['state']) || !empty($client['zip'])): ?>
                     <p style="margin:0px;">
-                        <?php echo htmlspecialchars($client->city ?? ''); ?>
-                        <?php echo !empty($client->state) ? ', ' . htmlspecialchars($client->state) : ''; ?>
-                        <?php echo htmlspecialchars($client->zip ?? ''); ?>
+                        <?php echo htmlspecialchars($client['city'] ?? ''); ?>
+                        <?php echo !empty($client['state']) ? ', ' . htmlspecialchars($client['state']) : ''; ?>
+                        <?php echo htmlspecialchars($client['zip'] ?? ''); ?>
                     </p>
                 <?php endif; ?>
             </div>
