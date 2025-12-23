@@ -10,10 +10,10 @@ $displayData = $displayData ?? [];
 $task = $displayData['task'] ?? 'previewPdf';
 
 $invoice  = ($displayData['invoice'] ?? null);
-$account  = (object) ($displayData['account'] ?? null);
-$client   = (object) ($displayData['client'] ?? null);
+$account  =($displayData['account'] ?? null);
+$client   = ($displayData['client'] ?? null);
 $business =  ($displayData['business'] ?? null);
-$items    = $invoice->items ?? [];
+$items    = $invoice['items'] ?? [];
 
 $imgHr     = realpath(__DIR__ . '/images/custom-hr.jpg') ?: '';
 $imgBullet = realpath(__DIR__ . '/images/invoice-bullet.png') ?: '';
@@ -27,7 +27,7 @@ function e($s): string {
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Invoice <?= e($invoice->number ?? '') ?></title>
+    <title>Invoice <?= e($invoice['number'] ?? '') ?></title>
 
     <style>
 
@@ -176,18 +176,18 @@ h1 {
             <br/><br/><br/>
 
             <div class="client-info" style="margin-top: 0;line-height:1.2em;font-size:12pt;font-weight:300;">
-                <p style="margin:0px;"><?php echo htmlspecialchars($client->name ?? $invoice->client_name ?? ''); ?></p>
-                <?php if (!empty($client->address_1)): ?>
-                    <p style="margin:0px;"><?php echo htmlspecialchars($client->address_1); ?></p>
+                <p style="margin:0px;"><?php echo htmlspecialchars($client['name'] ?? $invoice['client_name'] ?? ''); ?></p>
+                <?php if (!empty($client['address_1'])): ?>
+                    <p style="margin:0px;"><?php echo htmlspecialchars($client['address_1']); ?></p>
                 <?php endif; ?>
-                <?php if (!empty($client->address_2)): ?>
-                    <p style="margin:0px;"><?php echo htmlspecialchars($client->address_2); ?></p>
+                <?php if (!empty($client['address_2'])): ?>
+                    <p style="margin:0px;"><?php echo htmlspecialchars($client['address_2']); ?></p>
                 <?php endif; ?>
-                <?php if (!empty($client->city) || !empty($client->state) || !empty($client->zip)): ?>
+                <?php if (!empty($client['city']) || !empty($client['state']) || !empty($client['zip'])): ?>
                     <p style="margin:0px;">
-                        <?php echo htmlspecialchars($client->city ?? ''); ?>
-                        <?php echo !empty($client->state) ? ', ' . htmlspecialchars($client->state) : ''; ?>
-                        <?php echo htmlspecialchars($client->zip ?? ''); ?>
+                        <?php echo htmlspecialchars($client['city'] ?? ''); ?>
+                        <?php echo !empty($client['state']) ? ', ' . htmlspecialchars($client['state']) : ''; ?>
+                        <?php echo htmlspecialchars($client['zip'] ?? ''); ?>
                     </p>
                 <?php endif; ?>
             </div>
@@ -196,9 +196,9 @@ h1 {
             <div class="header-right">
                 <h1 style="font-weight:300;letter-spacing:1pt;">Invoice of Services</h1>
                 <div class="invoice-meta" style="text-align: right;">
-                    <p><strong>Invoice Number: </strong> #<?php echo htmlspecialchars($invoice->number); ?></p>
-                    <p><strong>Invoice Status:</strong> <?php echo htmlspecialchars($invoice->status); ?></p>
-                    <p><strong>Invoice Due:</strong> <?php echo htmlspecialchars($invoice->due_date ?? '—'); ?></p>
+                    <p><strong>Invoice Number: </strong> #<?php echo htmlspecialchars($invoice['number']); ?></p>
+                    <p><strong>Invoice Status:</strong> <?php echo htmlspecialchars($invoice['status']); ?></p>
+                    <p><strong>Invoice Due:</strong> <?php echo htmlspecialchars($invoice['due_date'] ?? '—'); ?></p>
                 </div>
             </div>
         </td>
@@ -207,15 +207,15 @@ h1 {
 
 <img src="<?= e($imgHr) ?>" alt="" style="width:100%; height:1px; margin:0;" />
 <div class="section account-heading">
-    <?php echo htmlspecialchars($account->name ?? ''); ?><br/>
-    <h6 style="margin:0px;padding:0px;margin-top:2mm;"><?php echo htmlspecialchars($invoice->title ?? ''); ?></h6>
+    <?php echo htmlspecialchars($account['name'] ?? ''); ?><br/>
+    <h6 style="margin:0px;padding:0px;margin-top:2mm;"><?php echo htmlspecialchars($invoice['title'] ?? ''); ?></h6>
 </div>
 
 <img src="<?= e($imgHr) ?>" alt="" style="width:100%; height:1px; margin:0;" />
 
-<?php if(!empty($invoice->summary)): ?>
+<?php if(!empty($invoice['summary'])): ?>
     <div class="section invoice-summary">
-        <?php echo $invoice->summary ?? ''; ?>
+        <?php echo $invoice['summary'] ?? ''; ?>
     </div>
     <pagebreak />
 <?php endif; ?>
@@ -271,18 +271,18 @@ h1 {
         </td>
         <td style="text-align: right; vertical-align: bottom;">
             <div class="total">
-                AMOUNT DUE: $<?php echo number_format((float)($invoice->total ?? 0), 2); ?><br>
+                AMOUNT DUE: $<?php echo number_format((float)($invoice['total'] ?? 0), 2); ?><br>
                 <span style="font-size: 10pt; font-weight: normal; color: #777;">Due upon receipt of invoice</span>
             </div>
         </td>
     </tr>
 </table>
 
-<?php if(!empty($invoice->notes)): ?>
+<?php if(!empty($invoice['notes'])): ?>
 <pagebreak />
 
 <div class="section invoice-notes">
-<?php echo $invoice->notes ?? ''; ?>
+<?php echo $invoice['notes'] ?? ''; ?>
 </div>
 <?php endif; ?>
 
