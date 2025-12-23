@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<bundle>
+  <title>Invoice PDF</title>
+  <filename>invoice.pdf</filename>
+
+  <format>Letter</format>
+
+  <margins>
+    <left>15</left>
+    <right>15</right>
+    <top>18</top>
+    <bottom>18</bottom>
+  </margins>
+</bundle>
