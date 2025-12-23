@@ -28,11 +28,9 @@ $dataFile     = $tmplDir . '/data.php';
 if (!is_dir($tmplDir)) {
     abort(404, 'Template directory not found.');
 }
-
 if (!is_file($bundleFile)) {
     abort(500, 'bundle.xml missing.');
 }
-
 if (!is_file($templateFile)) {
     abort(500, 'template.php missing.');
 }
@@ -59,7 +57,7 @@ $margins = [
 ];
 
 /**
- * Load data
+ * Load data.php
  */
 $data = [];
 if (is_file($dataFile)) {
@@ -70,11 +68,21 @@ if (is_file($dataFile)) {
 }
 
 /**
- * Render template
+ * Template data contract
+ * - $data: your "pdf-kit" native style
+ * - $displayData: compatibility w/ your existing invoice pdf.php templates
+ */
+$displayData = $data;
+
+// Handy for templates that want absolute paths to assets:
+$bundleDir = $tmplDir; // <-- fixes your undefined $bundleDir issue
+
+/**
+ * Render template -> HTML
  */
 ob_start();
 try {
-    require $templateFile;
+    require $templateFile; // template can use $data / $displayData / $tmplDir / $bundleDir
     $html = ob_get_clean();
 } catch (Throwable $e) {
     ob_end_clean();
@@ -84,9 +92,39 @@ try {
 /**
  * Render PDF
  */
-$fontDir = $bundleDir . '/fonts';
+$defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
+$defaultFont   = (new \Mpdf\Config\FontVariables())->getDefaults();
 
-$mpdf = new \Mpdf\Mpdf([
+$fontDir = $bundleDir . '/fonts';
+$fontDirs = $defaultConfig['fontDir'];
+
+if (is_dir($fontDir)) {
+    $fontDirs[] = $fontDir;
+}
+
+$fontData = $defaultFont['fontdata'];
+
+// Only register Open Sans if the expected files exist in this template's /fonts
+if (
+    is_file($fontDir . '/OpenSans-Regular.ttf') &&
+    is_file($fontDir . '/OpenSans-Bold.ttf') &&
+    is_file($fontDir . '/OpenSans-Italic.ttf') &&
+    is_file($fontDir . '/OpenSans-BoldItalic.ttf')
+) {
+    $fontData = $fontData + [
+        'opensans' => [
+            'R'  => 'OpenSans-Regular.ttf',
+            'B'  => 'OpenSans-Bold.ttf',
+            'I'  => 'OpenSans-Italic.ttf',
+            'BI' => 'OpenSans-BoldItalic.ttf',
+        ],
+    ];
+    $defaultFontName = 'opensans';
+} else {
+    $defaultFontName = $defaultConfig['default_font'] ?? 'dejavusans';
+}
+
+$mpdf = new Mpdf([
     'tempDir' => __DIR__ . '/tmp',
     'format'  => $format,
     'margin_left'   => $margins['left'],
@@ -94,20 +132,10 @@ $mpdf = new \Mpdf\Mpdf([
     'margin_top'    => $margins['top'],
     'margin_bottom' => $margins['bottom'],
 
-    'fontDir' => array_merge((new \Mpdf\Config\ConfigVariables())->getDefaults()['fontDir'], [
-        $fontDir,
-    ]),
-    'fontdata' => (new \Mpdf\Config\FontVariables())->getDefaults()['fontdata'] + [
-        'opensans' => [
-            'R'  => 'OpenSans-Regular.ttf',
-            'B'  => 'OpenSans-Bold.ttf',
-            'I'  => 'OpenSans-Italic.ttf',
-            'BI' => 'OpenSans-BoldItalic.ttf',
-        ],
-    ],
-    'default_font' => 'opensans',
+    'fontDir'      => $fontDirs,
+    'fontdata'     => $fontData,
+    'default_font' => $defaultFontName,
 ]);
-
 
 $mpdf->SetTitle($title);
 $mpdf->WriteHTML($html);
